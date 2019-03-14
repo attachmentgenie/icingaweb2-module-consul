@@ -7,7 +7,7 @@
         }
     ],
     "type": "library",
-    "description": "Icinga Web 2 - ReactPHP-based 3rd party libraries",
+    "description": "Icinga Web 2 - Director Syncsource for Consul",
     "homepage": "https://github.com/attachmentgenie/icingaweb2-module-consul",
     "support": {
         "issues": "https://github.com/attachmentgenie/icingaweb2-module-consul/issues"
