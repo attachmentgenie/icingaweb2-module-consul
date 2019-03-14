@@ -1,0 +1,60 @@
+{
+    "name": "attachmentgenie/icingaweb2-module-consul",
+    "authors": [
+        {
+            "name": "Bram Vogelaar",
+            "email": "bram@attachmentgenie.com"
+        }
+    ],
+    "type": "library",
+    "description": "Icinga Web 2 - ReactPHP-based 3rd party libraries",
+    "homepage": "https://github.com/attachmentgenie/icingaweb2-module-consul",
+    "support": {
+        "issues": "https://github.com/attachmentgenie/icingaweb2-module-consul/issues"
+    },
+    "license": "MIT",
+    "config": {
+        "platform": { "php": "7.1.8" },
+        "sort-packages": true
+    },
+    "require": {
+        "sensiolabs/consul-php-sdk": "^3.1"
+    },
+    "require-dev": {
+        "jakub-onderka/php-parallel-lint": "^1.0",
+        "sensiolabs/security-checker": "^5.0",
+        "squizlabs/php_codesniffer": "^3.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "library/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "check-updates": "composer outdated -Dm --strict",
+        "check-security": "vendor/bin/security-checker security:check composer.lock",
+        "lint": "vendor/bin/parallel-lint library",
+        "phpcs": "vendor/bin/phpcs library --standard=PSR12 -sp --colors --parallel=10",
+        "phpcs-fix": "vendor/bin/phpcbf --standard=PSR12 library",
+        "fix": [
+            "@phpcs-fix"
+        ],
+        "hygiene": [
+            "@check-updates",
+            "@check-security"
+        ],
+        "test": [
+            "@lint",
+            "@phpcs"
+        ],
+        "ci": [
+            "@hygiene",
+            "@test"
+        ]
+    }
+}

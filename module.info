@@ -1,0 +1,5 @@
+Name: Consul
+Version: 1.0.0
+Depends: director
+Description: Consul module for Icinga Web 2
+ This module provides a Consul import source for Icinga Director
