@@ -21,8 +21,8 @@ class ImportSource extends ImportSourceHook
     public function fetchData()
     {
         $sf = new ServiceFactory(array('base_uri' => $this->getSetting('consul_url')));
-        $agent = $sf->get('agent');
-        return json_decode($agent->members()->getBody());
+        $agent = $sf->get('catalog');
+        return json_decode($agent->nodes()->getBody());
     }
 
     public function listColumns()
@@ -35,7 +35,7 @@ class ImportSource extends ImportSourceHook
      */
     public static function getDefaultKeyColumnName()
     {
-        return 'Name';
+        return 'Node';
     }
 
     /**
