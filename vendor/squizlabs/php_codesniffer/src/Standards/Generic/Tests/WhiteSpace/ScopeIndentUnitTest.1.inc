@@ -1405,7 +1405,163 @@ switch($foo)
         $value = 0;
 }
 
+switch ($x) {
+    case 'a':
+        switch ($y) {
+            case 'c':
+                return true;
+        }
+    case 'b':
+        switch ($z) {
+            case 'd':
+                return true;
+        }
+}
+
+$foo = [
+    [
+        'a' => [
+        ],
+        'b' => <<<'FOO'
+foo;
+FOO
+    ],
+    $a,
+];
+
+$query = Model::query()
+   ->when($a, function () {
+        static $b = '';
+   });
+
+$result = array_map(
+    static fn(int $number) : int => $number + 1,
+    $numbers
+);
+
+$a = $a === true ? [
+    'a' => 1,
+    ] : [
+    'a' => 100,
+];
+
+return [
+    Url::make('View Song', fn($song) => $song->url())
+        ->onlyOnDetail(),
+
+    new Panel('Information', [
+        Text::make('Title')
+    ]),
+];
+
+echo $string?->append('foo')
+            ?->outputUsing();
+
+// phpcs:set Generic.WhiteSpace.ScopeIndent exact true
+echo $string?->append('foo')
+            ?->outputUsing();
+// phpcs:set Generic.WhiteSpace.ScopeIndent exact false
+
+if (true) {
+    ?><?php echo addslashes(
+        ''
+    )?><?php
+}
+
+class Foo
+{
+    public function __construct(
+        public int $intArg,
+    ) {
+    }
+}
+
+$value = match ($value) {
+    '' => null,
+    false => false,
+    1, 2, 3 => true,
+    default => $value,
+};
+
+$value = match ($value) {
+    '' => null,
+false => false,
+  1, 2, 3 => true,
+    default => $value,
+};
+
+$value = match (
+  $value
+  ) {
+    '' => null,
+    false
+      => false,
+    1,
+  2,
+      3 => true,
+    default =>
+$value,
+};
+
+function toString(): string
+{
+    return sprintf(
+        '%s',
+        match ($type) {
+            'foo' => 'bar',
+        },
+    );
+}
+
+$list = [
+    'fn' => function ($a) {
+                if ($a === true) {
+                    echo 'hi';
+                }
+    },
+        'fn' => function ($a) {
+            if ($a === true) {
+                echo 'hi';
+                $list2 = [
+                        'fn' => function ($a) {
+                                    if ($a === true) {
+                                        echo 'hi';
+                                    }
+                                }
+                            ];
+            }
+        }
+];
+
+$foo = match ($type) {
+    'a' => [
+        'aa' => 'DESC',
+        'ab' => 'DESC',
+    ],
+    'b' => [
+        'ba' => 'DESC',
+        'bb' => 'DESC',
+    ],
+    default => [
+        'da' => 'DESC',
+    ],
+};
+
+$a = [
+    'a' => [
+        'a' => fn () => foo()
+    ],
+    'a' => [
+        'a' => 'a',
+    ]
+];
+
+/* ADD NEW TESTS ABOVE THIS LINE AND MAKE SURE THAT THE 1 (space-based) AND 2 (tab-based) FILES ARE IN SYNC! */
 ?>
+
+     <?php if (true) : ?>
+         <span></span>
+     <?php endif ?>
 
 <?php
     if (true) {
@@ -1419,5 +1575,21 @@ $a = 1;
 $a = array(
     */
 );
+
+return [
+    'lor' =>
+        <<<'INTRO'
+        lorem ipsum
+        INTRO,
+    'em' => [
+        [
+            '',
+        ],
+    ],
+    'abc' => [
+        'a' => 'wop wop',
+        'b' => 'ola ola.',
+    ],
+];
 
 echo ""

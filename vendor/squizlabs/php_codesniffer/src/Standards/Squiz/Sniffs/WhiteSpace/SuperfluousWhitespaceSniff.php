@@ -13,8 +13,8 @@
 
 namespace PHP_CodeSniffer\Standards\Squiz\Sniffs\WhiteSpace;
 
-use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Sniffs\Sniff;
 
 class SuperfluousWhitespaceSniff implements Sniff
 {
@@ -49,6 +49,7 @@ class SuperfluousWhitespaceSniff implements Sniff
     {
         return [
             T_OPEN_TAG,
+            T_OPEN_TAG_WITH_ECHO,
             T_CLOSE_TAG,
             T_WHITESPACE,
             T_COMMENT,

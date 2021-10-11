@@ -1,0 +1,23 @@
+{
+    "name": "thibautselingue/local-php-security-checker-installer",
+    "description": "Composer integration for local PHP security check",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thibaut Selingue",
+            "email": "thibaut.selingue@gmail.com"
+        }
+    ],
+    "bin": [
+        "bin/local-php-security-checker-installer"
+    ],
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        }
+    },
+    "require": {
+        "php": ">=5.3"
+    }
+}

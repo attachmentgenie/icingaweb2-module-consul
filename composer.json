@@ -14,16 +14,15 @@
     },
     "license": "MIT",
     "config": {
-        "platform": { "php": "7.1.8" },
         "sort-packages": true
     },
     "require": {
-        "sensiolabs/consul-php-sdk": "^3.1"
+        "sensiolabs/consul-php-sdk": "^4.1"
     },
     "require-dev": {
-        "jakub-onderka/php-parallel-lint": "^1.0",
-        "sensiolabs/security-checker": "^5.0",
-        "squizlabs/php_codesniffer": "^3.4"
+        "php-parallel-lint/php-parallel-lint": "^1.0",
+        "thibautselingue/local-php-security-checker-installer": "^1.0",
+        "squizlabs/php_codesniffer": "^3.6"
     },
     "autoload": {
         "psr-4": {

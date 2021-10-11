@@ -12,14 +12,14 @@
 
 namespace PHP_CodeSniffer;
 
-use PHP_CodeSniffer\Files\FileList;
-use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Exceptions\DeepExitException;
+use PHP_CodeSniffer\Exceptions\RuntimeException;
 use PHP_CodeSniffer\Files\DummyFile;
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Files\FileList;
 use PHP_CodeSniffer\Util\Cache;
 use PHP_CodeSniffer\Util\Common;
 use PHP_CodeSniffer\Util\Standards;
-use PHP_CodeSniffer\Exceptions\RuntimeException;
-use PHP_CodeSniffer\Exceptions\DeepExitException;
 
 class Runner
 {
@@ -232,8 +232,8 @@ class Runner
     /**
      * Exits if the minimum requirements of PHP_CodeSniffer are not met.
      *
-     * @return array
-     * @throws \PHP_CodeSniffer\Exceptions\DeepExitException
+     * @return void
+     * @throws \PHP_CodeSniffer\Exceptions\DeepExitException If the requirements are not met.
      */
     public function checkRequirements()
     {
@@ -281,7 +281,7 @@ class Runner
      * Init the rulesets and other high-level settings.
      *
      * @return void
-     * @throws \PHP_CodeSniffer\Exceptions\DeepExitException
+     * @throws \PHP_CodeSniffer\Exceptions\DeepExitException If a referenced standard is not installed.
      */
     public function init()
     {
@@ -291,7 +291,7 @@ class Runner
 
         // Ensure this option is enabled or else line endings will not always
         // be detected properly for files created on a Mac with the /r line ending.
-        ini_set('auto_detect_line_endings', true);
+        @ini_set('auto_detect_line_endings', true);
 
         // Disable the PCRE JIT as this caused issues with parallel running.
         ini_set('pcre.jit', false);
@@ -487,6 +487,7 @@ class Runner
                         $file = $todo->current();
 
                         if ($file->ignored === true) {
+                            $todo->next();
                             continue;
                         }
 
@@ -708,7 +709,7 @@ class Runner
      *
      * @param array $childProcs An array of child processes to wait for.
      *
-     * @return void
+     * @return bool
      */
     private function processChildProcs($childProcs)
     {
@@ -731,7 +732,7 @@ class Runner
 
                         if (isset($childOutput) === false) {
                             // The child process died, so the run has failed.
-                            $file = new DummyFile(null, $this->ruleset, $this->config);
+                            $file = new DummyFile('', $this->ruleset, $this->config);
                             $file->setErrorCounts(1, 0, 0, 0);
                             $this->printProgress($file, $totalBatches, $numProcessed);
                             $success = false;
@@ -755,7 +756,7 @@ class Runner
                         }
 
                         // Fake a processed file so we can print progress output for the batch.
-                        $file = new DummyFile(null, $this->ruleset, $this->config);
+                        $file = new DummyFile('', $this->ruleset, $this->config);
                         $file->setErrorCounts(
                             $childOutput['totalErrors'],
                             $childOutput['totalWarnings'],
@@ -874,7 +875,10 @@ class Runner
 
         $percent = round(($numProcessed / $numFiles) * 100);
         $padding = (strlen($numFiles) - strlen($numProcessed));
-        if ($numProcessed === $numFiles && $numFiles > $numPerLine) {
+        if ($numProcessed === $numFiles
+            && $numFiles > $numPerLine
+            && ($numProcessed % $numPerLine) !== 0
+        ) {
             $padding += ($numPerLine - ($numFiles - (floor($numFiles / $numPerLine) * $numPerLine)));
         }
 

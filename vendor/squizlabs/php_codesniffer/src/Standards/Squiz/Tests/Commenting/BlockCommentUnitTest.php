@@ -41,6 +41,7 @@ class BlockCommentUnitTest extends AbstractSniffUnitTest
     public function getErrorList()
     {
         $errors = [
+            3   => 1,
             8   => 1,
             20  => 1,
             24  => 1,
@@ -75,6 +76,9 @@ class BlockCommentUnitTest extends AbstractSniffUnitTest
             227 => 1,
             232 => 1,
             233 => 1,
+            256 => 1,
+            271 => 1,
+            273 => 1,
         ];
 
         return $errors;

@@ -34,6 +34,7 @@ class Cbf implements Report
      * @param int                   $width       Maximum allowed line width.
      *
      * @return bool
+     * @throws \PHP_CodeSniffer\Exceptions\DeepExitException
      */
     public function generateFileReport($report, File $phpcsFile, $showSources=false, $width=80)
     {
@@ -43,6 +44,9 @@ class Cbf implements Report
                 ob_end_clean();
                 $startTime = microtime(true);
                 echo "\t=> Fixing file: $errors/$errors violations remaining";
+                if (PHP_CODESNIFFER_VERBOSITY > 1) {
+                    echo PHP_EOL;
+                }
             }
 
             $fixed = $phpcsFile->fixer->fixFile();

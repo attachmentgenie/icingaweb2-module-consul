@@ -9,8 +9,8 @@
 
 namespace PHP_CodeSniffer\Standards\Squiz\Sniffs\Commenting;
 
-use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Sniffs\Sniff;
 
 class FileCommentSniff implements Sniff
 {
@@ -72,12 +72,24 @@ class FileCommentSniff implements Sniff
 
         $commentEnd = $tokens[$commentStart]['comment_closer'];
 
-        $nextToken = $phpcsFile->findNext(
-            T_WHITESPACE,
-            ($commentEnd + 1),
-            null,
-            true
-        );
+        for ($nextToken = ($commentEnd + 1); $nextToken < $phpcsFile->numTokens; $nextToken++) {
+            if ($tokens[$nextToken]['code'] === T_WHITESPACE) {
+                continue;
+            }
+
+            if ($tokens[$nextToken]['code'] === T_ATTRIBUTE
+                && isset($tokens[$nextToken]['attribute_closer']) === true
+            ) {
+                $nextToken = $tokens[$nextToken]['attribute_closer'];
+                continue;
+            }
+
+            break;
+        }
+
+        if ($nextToken === $phpcsFile->numTokens) {
+            $nextToken--;
+        }
 
         $ignore = [
             T_CLASS,
@@ -115,7 +127,7 @@ class FileCommentSniff implements Sniff
 
         // Exactly one blank line after the file comment.
         $next = $phpcsFile->findNext(T_WHITESPACE, ($commentEnd + 1), null, true);
-        if ($tokens[$next]['line'] !== ($tokens[$commentEnd]['line'] + 2)) {
+        if ($next !== false && $tokens[$next]['line'] !== ($tokens[$commentEnd]['line'] + 2)) {
             $error = 'There must be exactly one blank line after the file comment';
             $phpcsFile->addError($error, $commentEnd, 'SpacingAfterComment');
         }

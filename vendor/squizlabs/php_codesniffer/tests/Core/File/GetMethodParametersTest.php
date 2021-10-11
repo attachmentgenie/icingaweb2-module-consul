@@ -9,54 +9,10 @@
 
 namespace PHP_CodeSniffer\Tests\Core\File;
 
-use PHP_CodeSniffer\Config;
-use PHP_CodeSniffer\Ruleset;
-use PHP_CodeSniffer\Files\DummyFile;
-use PHPUnit\Framework\TestCase;
+use PHP_CodeSniffer\Tests\Core\AbstractMethodUnitTest;
 
-class GetMethodParametersTest extends TestCase
+class GetMethodParametersTest extends AbstractMethodUnitTest
 {
-
-    /**
-     * The PHP_CodeSniffer_File object containing parsed contents of the test case file.
-     *
-     * @var \PHP_CodeSniffer\Files\File
-     */
-    private $phpcsFile;
-
-
-    /**
-     * Initialize & tokenize PHP_CodeSniffer_File with code from the test case file.
-     *
-     * Methods used for these tests can be found in a test case file in the same
-     * directory and with the same name, using the .inc extension.
-     *
-     * @return void
-     */
-    public function setUp()
-    {
-        $config            = new Config();
-        $config->standards = ['Generic'];
-
-        $ruleset = new Ruleset($config);
-
-        $pathToTestFile  = dirname(__FILE__).'/'.basename(__FILE__, '.php').'.inc';
-        $this->phpcsFile = new DummyFile(file_get_contents($pathToTestFile), $ruleset, $config);
-        $this->phpcsFile->process();
-
-    }//end setUp()
-
-
-    /**
-     * Clean up after finished test.
-     *
-     * @return void
-     */
-    public function tearDown()
-    {
-        unset($this->phpcsFile);
-
-    }//end tearDown()
 
 
     /**
@@ -70,25 +26,14 @@ class GetMethodParametersTest extends TestCase
         $expected[0] = [
             'name'              => '$var',
             'content'           => '&$var',
+            'has_attributes'    => false,
             'pass_by_reference' => true,
             'variable_length'   => false,
             'type_hint'         => '',
             'nullable_type'     => false,
         ];
 
-        $start    = ($this->phpcsFile->numTokens - 1);
-        $function = $this->phpcsFile->findPrevious(
-            T_COMMENT,
-            $start,
-            null,
-            false,
-            '/* testPassByReference */'
-        );
-
-        $found = $this->phpcsFile->getMethodParameters(($function + 2));
-        unset($found[0]['token']);
-        unset($found[0]['type_hint_token']);
-        $this->assertSame($expected, $found);
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
 
     }//end testPassByReference()
 
@@ -104,25 +49,14 @@ class GetMethodParametersTest extends TestCase
         $expected[0] = [
             'name'              => '$var',
             'content'           => 'array $var',
+            'has_attributes'    => false,
             'pass_by_reference' => false,
             'variable_length'   => false,
             'type_hint'         => 'array',
             'nullable_type'     => false,
         ];
 
-        $start    = ($this->phpcsFile->numTokens - 1);
-        $function = $this->phpcsFile->findPrevious(
-            T_COMMENT,
-            $start,
-            null,
-            false,
-            '/* testArrayHint */'
-        );
-
-        $found = $this->phpcsFile->getMethodParameters(($function + 2));
-        unset($found[0]['token']);
-        unset($found[0]['type_hint_token']);
-        $this->assertSame($expected, $found);
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
 
     }//end testArrayHint()
 
@@ -138,6 +72,7 @@ class GetMethodParametersTest extends TestCase
         $expected[0] = [
             'name'              => '$var1',
             'content'           => 'foo $var1',
+            'has_attributes'    => false,
             'pass_by_reference' => false,
             'variable_length'   => false,
             'type_hint'         => 'foo',
@@ -147,27 +82,14 @@ class GetMethodParametersTest extends TestCase
         $expected[1] = [
             'name'              => '$var2',
             'content'           => 'bar $var2',
+            'has_attributes'    => false,
             'pass_by_reference' => false,
             'variable_length'   => false,
             'type_hint'         => 'bar',
             'nullable_type'     => false,
         ];
 
-        $start    = ($this->phpcsFile->numTokens - 1);
-        $function = $this->phpcsFile->findPrevious(
-            T_COMMENT,
-            $start,
-            null,
-            false,
-            '/* testTypeHint */'
-        );
-
-        $found = $this->phpcsFile->getMethodParameters(($function + 2));
-        unset($found[0]['token']);
-        unset($found[1]['token']);
-        unset($found[0]['type_hint_token']);
-        unset($found[1]['type_hint_token']);
-        $this->assertSame($expected, $found);
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
 
     }//end testTypeHint()
 
@@ -183,25 +105,14 @@ class GetMethodParametersTest extends TestCase
         $expected[0] = [
             'name'              => '$var',
             'content'           => 'self $var',
+            'has_attributes'    => false,
             'pass_by_reference' => false,
             'variable_length'   => false,
             'type_hint'         => 'self',
             'nullable_type'     => false,
         ];
 
-        $start    = ($this->phpcsFile->numTokens - 1);
-        $function = $this->phpcsFile->findPrevious(
-            T_COMMENT,
-            $start,
-            null,
-            false,
-            '/* testSelfTypeHint */'
-        );
-
-        $found = $this->phpcsFile->getMethodParameters(($function + 2));
-        unset($found[0]['token']);
-        unset($found[0]['type_hint_token']);
-        $this->assertSame($expected, $found);
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
 
     }//end testSelfTypeHint()
 
@@ -217,6 +128,7 @@ class GetMethodParametersTest extends TestCase
         $expected[0] = [
             'name'              => '$var1',
             'content'           => '?int $var1',
+            'has_attributes'    => false,
             'pass_by_reference' => false,
             'variable_length'   => false,
             'type_hint'         => '?int',
@@ -226,27 +138,14 @@ class GetMethodParametersTest extends TestCase
         $expected[1] = [
             'name'              => '$var2',
             'content'           => '?\bar $var2',
+            'has_attributes'    => false,
             'pass_by_reference' => false,
             'variable_length'   => false,
             'type_hint'         => '?\bar',
             'nullable_type'     => true,
         ];
 
-        $start    = ($this->phpcsFile->numTokens - 1);
-        $function = $this->phpcsFile->findPrevious(
-            T_COMMENT,
-            $start,
-            null,
-            false,
-            '/* testNullableTypeHint */'
-        );
-
-        $found = $this->phpcsFile->getMethodParameters(($function + 2));
-        unset($found[0]['token']);
-        unset($found[1]['token']);
-        unset($found[0]['type_hint_token']);
-        unset($found[1]['type_hint_token']);
-        $this->assertSame($expected, $found);
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
 
     }//end testNullableTypeHint()
 
@@ -262,25 +161,14 @@ class GetMethodParametersTest extends TestCase
         $expected[0] = [
             'name'              => '$var',
             'content'           => '$var',
+            'has_attributes'    => false,
             'pass_by_reference' => false,
             'variable_length'   => false,
             'type_hint'         => '',
             'nullable_type'     => false,
         ];
 
-        $start    = ($this->phpcsFile->numTokens - 1);
-        $function = $this->phpcsFile->findPrevious(
-            T_COMMENT,
-            $start,
-            null,
-            false,
-            '/* testVariable */'
-        );
-
-        $found = $this->phpcsFile->getMethodParameters(($function + 2));
-        unset($found[0]['token']);
-        unset($found[0]['type_hint_token']);
-        $this->assertSame($expected, $found);
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
 
     }//end testVariable()
 
@@ -296,6 +184,7 @@ class GetMethodParametersTest extends TestCase
         $expected[0] = [
             'name'              => '$var1',
             'content'           => '$var1=self::CONSTANT',
+            'has_attributes'    => false,
             'default'           => 'self::CONSTANT',
             'pass_by_reference' => false,
             'variable_length'   => false,
@@ -303,19 +192,7 @@ class GetMethodParametersTest extends TestCase
             'nullable_type'     => false,
         ];
 
-        $start    = ($this->phpcsFile->numTokens - 1);
-        $function = $this->phpcsFile->findPrevious(
-            T_COMMENT,
-            $start,
-            null,
-            false,
-            '/* testSingleDefaultValue */'
-        );
-
-        $found = $this->phpcsFile->getMethodParameters(($function + 2));
-        unset($found[0]['token']);
-        unset($found[0]['type_hint_token']);
-        $this->assertSame($expected, $found);
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
 
     }//end testSingleDefaultValue()
 
@@ -331,6 +208,7 @@ class GetMethodParametersTest extends TestCase
         $expected[0] = [
             'name'              => '$var1',
             'content'           => '$var1=1',
+            'has_attributes'    => false,
             'default'           => '1',
             'pass_by_reference' => false,
             'variable_length'   => false,
@@ -340,6 +218,7 @@ class GetMethodParametersTest extends TestCase
         $expected[1] = [
             'name'              => '$var2',
             'content'           => "\$var2='value'",
+            'has_attributes'    => false,
             'default'           => "'value'",
             'pass_by_reference' => false,
             'variable_length'   => false,
@@ -347,21 +226,7 @@ class GetMethodParametersTest extends TestCase
             'nullable_type'     => false,
         ];
 
-        $start    = ($this->phpcsFile->numTokens - 1);
-        $function = $this->phpcsFile->findPrevious(
-            T_COMMENT,
-            $start,
-            null,
-            false,
-            '/* testDefaultValues */'
-        );
-
-        $found = $this->phpcsFile->getMethodParameters(($function + 2));
-        unset($found[0]['token']);
-        unset($found[1]['token']);
-        unset($found[0]['type_hint_token']);
-        unset($found[1]['type_hint_token']);
-        $this->assertSame($expected, $found);
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
 
     }//end testDefaultValues()
 
@@ -378,27 +243,727 @@ class GetMethodParametersTest extends TestCase
             'name'              => '$a',
             'content'           => '$a = 10 & 20',
             'default'           => '10 & 20',
+            'has_attributes'    => false,
             'pass_by_reference' => false,
             'variable_length'   => false,
             'type_hint'         => '',
             'nullable_type'     => false,
         ];
 
-        $start    = ($this->phpcsFile->numTokens - 1);
-        $function = $this->phpcsFile->findPrevious(
-            T_COMMENT,
-            $start,
-            null,
-            false,
-            '/* testBitwiseAndConstantExpressionDefaultValue */'
-        );
-
-        $found = $this->phpcsFile->getMethodParameters(($function + 2));
-        unset($found[0]['token']);
-        unset($found[0]['type_hint_token']);
-        $this->assertSame($expected, $found);
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
 
     }//end testBitwiseAndConstantExpressionDefaultValue()
+
+
+    /**
+     * Verify that arrow functions are supported.
+     *
+     * @return void
+     */
+    public function testArrowFunction()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$a',
+            'content'           => 'int $a',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'int',
+            'nullable_type'     => false,
+        ];
+
+        $expected[1] = [
+            'name'              => '$b',
+            'content'           => '...$b',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => true,
+            'type_hint'         => '',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testArrowFunction()
+
+
+    /**
+     * Verify recognition of PHP8 mixed type declaration.
+     *
+     * @return void
+     */
+    public function testPHP8MixedTypeHint()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var1',
+            'content'           => 'mixed &...$var1',
+            'has_attributes'    => false,
+            'pass_by_reference' => true,
+            'variable_length'   => true,
+            'type_hint'         => 'mixed',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8MixedTypeHint()
+
+
+    /**
+     * Verify recognition of PHP8 mixed type declaration with nullability.
+     *
+     * @return void
+     */
+    public function testPHP8MixedTypeHintNullable()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var1',
+            'content'           => '?Mixed $var1',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => '?Mixed',
+            'nullable_type'     => true,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8MixedTypeHintNullable()
+
+
+    /**
+     * Verify recognition of type declarations using the namespace operator.
+     *
+     * @return void
+     */
+    public function testNamespaceOperatorTypeHint()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var1',
+            'content'           => '?namespace\Name $var1',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => '?namespace\Name',
+            'nullable_type'     => true,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testNamespaceOperatorTypeHint()
+
+
+    /**
+     * Verify recognition of PHP8 union type declaration.
+     *
+     * @return void
+     */
+    public function testPHP8UnionTypesSimple()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$number',
+            'content'           => 'int|float $number',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'int|float',
+            'nullable_type'     => false,
+        ];
+        $expected[1] = [
+            'name'              => '$obj',
+            'content'           => 'self|parent &...$obj',
+            'has_attributes'    => false,
+            'pass_by_reference' => true,
+            'variable_length'   => true,
+            'type_hint'         => 'self|parent',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8UnionTypesSimple()
+
+
+    /**
+     * Verify recognition of PHP8 union type declaration when the variable has either a spread operator or a reference.
+     *
+     * @return void
+     */
+    public function testPHP8UnionTypesWithSpreadOperatorAndReference()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$paramA',
+            'content'           => 'float|null &$paramA',
+            'has_attributes'    => false,
+            'pass_by_reference' => true,
+            'variable_length'   => false,
+            'type_hint'         => 'float|null',
+            'nullable_type'     => false,
+        ];
+        $expected[1] = [
+            'name'              => '$paramB',
+            'content'           => 'string|int ...$paramB',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => true,
+            'type_hint'         => 'string|int',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8UnionTypesWithSpreadOperatorAndReference()
+
+
+    /**
+     * Verify recognition of PHP8 union type declaration with a bitwise or in the default value.
+     *
+     * @return void
+     */
+    public function testPHP8UnionTypesSimpleWithBitwiseOrInDefault()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var',
+            'content'           => 'int|float $var = CONSTANT_A | CONSTANT_B',
+            'default'           => 'CONSTANT_A | CONSTANT_B',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'int|float',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8UnionTypesSimpleWithBitwiseOrInDefault()
+
+
+    /**
+     * Verify recognition of PHP8 union type declaration with two classes.
+     *
+     * @return void
+     */
+    public function testPHP8UnionTypesTwoClasses()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var',
+            'content'           => 'MyClassA|\Package\MyClassB $var',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'MyClassA|\Package\MyClassB',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8UnionTypesTwoClasses()
+
+
+    /**
+     * Verify recognition of PHP8 union type declaration with all base types.
+     *
+     * @return void
+     */
+    public function testPHP8UnionTypesAllBaseTypes()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var',
+            'content'           => 'array|bool|callable|int|float|null|object|string $var',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'array|bool|callable|int|float|null|object|string',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8UnionTypesAllBaseTypes()
+
+
+    /**
+     * Verify recognition of PHP8 union type declaration with all pseudo types.
+     *
+     * @return void
+     */
+    public function testPHP8UnionTypesAllPseudoTypes()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var',
+            'content'           => 'false|mixed|self|parent|iterable|Resource $var',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'false|mixed|self|parent|iterable|Resource',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8UnionTypesAllPseudoTypes()
+
+
+    /**
+     * Verify recognition of PHP8 union type declaration with (illegal) nullability.
+     *
+     * @return void
+     */
+    public function testPHP8UnionTypesNullable()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$number',
+            'content'           => '?int|float $number',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => '?int|float',
+            'nullable_type'     => true,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8UnionTypesNullable()
+
+
+    /**
+     * Verify recognition of PHP8 type declaration with (illegal) single type null.
+     *
+     * @return void
+     */
+    public function testPHP8PseudoTypeNull()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var',
+            'content'           => 'null $var = null',
+            'default'           => 'null',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'null',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8PseudoTypeNull()
+
+
+    /**
+     * Verify recognition of PHP8 type declaration with (illegal) single type false.
+     *
+     * @return void
+     */
+    public function testPHP8PseudoTypeFalse()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var',
+            'content'           => 'false $var = false',
+            'default'           => 'false',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'false',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8PseudoTypeFalse()
+
+
+    /**
+     * Verify recognition of PHP8 type declaration with (illegal) type false combined with type bool.
+     *
+     * @return void
+     */
+    public function testPHP8PseudoTypeFalseAndBool()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var',
+            'content'           => 'bool|false $var = false',
+            'default'           => 'false',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'bool|false',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8PseudoTypeFalseAndBool()
+
+
+    /**
+     * Verify recognition of PHP8 type declaration with (illegal) type object combined with a class name.
+     *
+     * @return void
+     */
+    public function testPHP8ObjectAndClass()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var',
+            'content'           => 'object|ClassName $var',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'object|ClassName',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8ObjectAndClass()
+
+
+    /**
+     * Verify recognition of PHP8 type declaration with (illegal) type iterable combined with array/Traversable.
+     *
+     * @return void
+     */
+    public function testPHP8PseudoTypeIterableAndArray()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var',
+            'content'           => 'iterable|array|Traversable $var',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'iterable|array|Traversable',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8PseudoTypeIterableAndArray()
+
+
+    /**
+     * Verify recognition of PHP8 type declaration with (illegal) duplicate types.
+     *
+     * @return void
+     */
+    public function testPHP8DuplicateTypeInUnionWhitespaceAndComment()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$var',
+            'content'           => 'int | string /*comment*/ | INT $var',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'int|string|INT',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8DuplicateTypeInUnionWhitespaceAndComment()
+
+
+    /**
+     * Verify recognition of PHP8 constructor property promotion without type declaration, with defaults.
+     *
+     * @return void
+     */
+    public function testPHP8ConstructorPropertyPromotionNoTypes()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'                => '$x',
+            'content'             => 'public $x = 0.0',
+            'default'             => '0.0',
+            'has_attributes'      => false,
+            'pass_by_reference'   => false,
+            'variable_length'     => false,
+            'type_hint'           => '',
+            'nullable_type'       => false,
+            'property_visibility' => 'public',
+        ];
+        $expected[1] = [
+            'name'                => '$y',
+            'content'             => 'protected $y = \'\'',
+            'default'             => "''",
+            'has_attributes'      => false,
+            'pass_by_reference'   => false,
+            'variable_length'     => false,
+            'type_hint'           => '',
+            'nullable_type'       => false,
+            'property_visibility' => 'protected',
+        ];
+        $expected[2] = [
+            'name'                => '$z',
+            'content'             => 'private $z = null',
+            'default'             => 'null',
+            'has_attributes'      => false,
+            'pass_by_reference'   => false,
+            'variable_length'     => false,
+            'type_hint'           => '',
+            'nullable_type'       => false,
+            'property_visibility' => 'private',
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8ConstructorPropertyPromotionNoTypes()
+
+
+    /**
+     * Verify recognition of PHP8 constructor property promotion with type declarations.
+     *
+     * @return void
+     */
+    public function testPHP8ConstructorPropertyPromotionWithTypes()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'                => '$x',
+            'content'             => 'protected float|int $x',
+            'has_attributes'      => false,
+            'pass_by_reference'   => false,
+            'variable_length'     => false,
+            'type_hint'           => 'float|int',
+            'nullable_type'       => false,
+            'property_visibility' => 'protected',
+        ];
+        $expected[1] = [
+            'name'                => '$y',
+            'content'             => 'public ?string &$y = \'test\'',
+            'default'             => "'test'",
+            'has_attributes'      => false,
+            'pass_by_reference'   => true,
+            'variable_length'     => false,
+            'type_hint'           => '?string',
+            'nullable_type'       => true,
+            'property_visibility' => 'public',
+        ];
+        $expected[2] = [
+            'name'                => '$z',
+            'content'             => 'private mixed $z',
+            'has_attributes'      => false,
+            'pass_by_reference'   => false,
+            'variable_length'     => false,
+            'type_hint'           => 'mixed',
+            'nullable_type'       => false,
+            'property_visibility' => 'private',
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8ConstructorPropertyPromotionWithTypes()
+
+
+    /**
+     * Verify recognition of PHP8 constructor with both property promotion as well as normal parameters.
+     *
+     * @return void
+     */
+    public function testPHP8ConstructorPropertyPromotionAndNormalParam()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'                => '$promotedProp',
+            'content'             => 'public int $promotedProp',
+            'has_attributes'      => false,
+            'pass_by_reference'   => false,
+            'variable_length'     => false,
+            'type_hint'           => 'int',
+            'nullable_type'       => false,
+            'property_visibility' => 'public',
+        ];
+        $expected[1] = [
+            'name'              => '$normalArg',
+            'content'           => '?int $normalArg',
+            'has_attributes'    => false,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => '?int',
+            'nullable_type'     => true,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8ConstructorPropertyPromotionAndNormalParam()
+
+
+    /**
+     * Verify behaviour when a non-constructor function uses PHP 8 property promotion syntax.
+     *
+     * @return void
+     */
+    public function testPHP8ConstructorPropertyPromotionGlobalFunction()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'                => '$x',
+            'content'             => 'private $x',
+            'has_attributes'      => false,
+            'pass_by_reference'   => false,
+            'variable_length'     => false,
+            'type_hint'           => '',
+            'nullable_type'       => false,
+            'property_visibility' => 'private',
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8ConstructorPropertyPromotionGlobalFunction()
+
+
+    /**
+     * Verify behaviour when an abstract constructor uses PHP 8 property promotion syntax.
+     *
+     * @return void
+     */
+    public function testPHP8ConstructorPropertyPromotionAbstractMethod()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'                => '$y',
+            'content'             => 'public callable $y',
+            'has_attributes'      => false,
+            'pass_by_reference'   => false,
+            'variable_length'     => false,
+            'type_hint'           => 'callable',
+            'nullable_type'       => false,
+            'property_visibility' => 'public',
+        ];
+        $expected[1] = [
+            'name'                => '$x',
+            'content'             => 'private ...$x',
+            'has_attributes'      => false,
+            'pass_by_reference'   => false,
+            'variable_length'     => true,
+            'type_hint'           => '',
+            'nullable_type'       => false,
+            'property_visibility' => 'private',
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testPHP8ConstructorPropertyPromotionAbstractMethod()
+
+
+    /**
+     * Verify and document behaviour when there are comments within a parameter declaration.
+     *
+     * @return void
+     */
+    public function testCommentsInParameter()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'              => '$param',
+            'content'           => '// Leading comment.
+    ?MyClass /*-*/ & /*-*/.../*-*/ $param /*-*/ = /*-*/ \'default value\' . /*-*/ \'second part\' // Trailing comment.',
+            'has_attributes'    => false,
+            'pass_by_reference' => true,
+            'variable_length'   => true,
+            'type_hint'         => '?MyClass',
+            'nullable_type'     => true,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testCommentsInParameter()
+
+
+    /**
+     * Verify behaviour when parameters have attributes attached.
+     *
+     * @return void
+     */
+    public function testParameterAttributesInFunctionDeclaration()
+    {
+        $expected    = [];
+        $expected[0] = [
+            'name'                => '$constructorPropPromTypedParamSingleAttribute',
+            'content'             => '#[\MyExample\MyAttribute] private string $constructorPropPromTypedParamSingleAttribute',
+            'has_attributes'      => true,
+            'pass_by_reference'   => false,
+            'variable_length'     => false,
+            'type_hint'           => 'string',
+            'nullable_type'       => false,
+            'property_visibility' => 'private',
+        ];
+        $expected[1] = [
+            'name'              => '$typedParamSingleAttribute',
+            'content'           => '#[MyAttr([1, 2])]
+        Type|false
+        $typedParamSingleAttribute',
+            'has_attributes'    => true,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => 'Type|false',
+            'nullable_type'     => false,
+        ];
+        $expected[2] = [
+            'name'              => '$nullableTypedParamMultiAttribute',
+            'content'           => '#[MyAttribute(1234), MyAttribute(5678)] ?int $nullableTypedParamMultiAttribute',
+            'has_attributes'    => true,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => '?int',
+            'nullable_type'     => true,
+        ];
+        $expected[3] = [
+            'name'              => '$nonTypedParamTwoAttributes',
+            'content'           => '#[WithoutArgument] #[SingleArgument(0)] $nonTypedParamTwoAttributes',
+            'has_attributes'    => true,
+            'pass_by_reference' => false,
+            'variable_length'   => false,
+            'type_hint'         => '',
+            'nullable_type'     => false,
+        ];
+        $expected[4] = [
+            'name'              => '$otherParam',
+            'content'           => '#[MyAttribute(array("key" => "value"))]
+        &...$otherParam',
+            'has_attributes'    => true,
+            'pass_by_reference' => true,
+            'variable_length'   => true,
+            'type_hint'         => '',
+            'nullable_type'     => false,
+        ];
+
+        $this->getMethodParametersTestHelper('/* '.__FUNCTION__.' */', $expected);
+
+    }//end testParameterAttributesInFunctionDeclaration()
+
+
+    /**
+     * Test helper.
+     *
+     * @param string $commentString The comment which preceeds the test.
+     * @param array  $expected      The expected function output.
+     *
+     * @return void
+     */
+    private function getMethodParametersTestHelper($commentString, $expected)
+    {
+        $function = $this->getTargetToken($commentString, [T_FUNCTION, T_CLOSURE, T_FN]);
+        $found    = self::$phpcsFile->getMethodParameters($function);
+
+        $this->assertArraySubset($expected, $found, true);
+
+    }//end getMethodParametersTestHelper()
 
 
 }//end class

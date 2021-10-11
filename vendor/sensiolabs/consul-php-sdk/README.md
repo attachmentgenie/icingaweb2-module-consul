@@ -4,12 +4,14 @@ Consul SDK
 Compatibility
 -------------
 
-This table shows this SDK compatibility regarding Guzzle version:
+This table shows this SDK compatibility regarding supported Guzzle/Symfony http client versions:
 
-| SDK Version | Guzzle Version
-| ----------- | --------------
-| 1.x         | >=4, <6
-| 2.x         | 6
+| SDK Version | Guzzle Version | Symfony HTTP Client |
+| ----------- | -------------- | ------------------- |
+| 1.x         | >=4, <6        | N/A                 |
+| 2.x         | 6              | N/A                 |
+| 3.x         | 6              | N/A                 |
+| 4.x         | N/A            | 5                   |
 
 Installation
 ------------
@@ -30,7 +32,7 @@ $sf = new SensioLabs\Consul\ServiceFactory();
 Then, a service could be retrieve from this factory:
 
 ```php
-$kv = $sf->get('kv');
+$kv = $sf->get(\SensioLabs\Consul\Services\KVInterface::class);
 ```
 
 Then, a service expose few methods mapped from the consul [API](https://consul.io/docs/agent/http.html):
@@ -49,7 +51,7 @@ $response = $service->method($mandatoryArgument, $someOptions);
 
 * All API mandatory arguments are placed as first;
 * All API optional arguments are directly mapped from `$someOptions`;
-* All methods return raw guzzle response.
+* All methods return a raw http client response.
 
 So if you want to acquire an exclusive lock:
 
@@ -82,6 +84,7 @@ Available services
 * catalog
 * health
 * kv
+* txn
 * session
 
 Some utilities
